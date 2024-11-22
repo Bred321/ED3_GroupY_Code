@@ -10,11 +10,12 @@ long t = 0;
 long t_prev = 0;
 
 
-void calculate_time(){
+double calculate_time(){
     // Calculate the delta T
     t = micros();
     deltaT = ((double)(t - t_prev))/1.0e6;
     t_prev = t;
+    return t_prev;
 }
 
 void setup(){
@@ -36,9 +37,9 @@ void loop(){
     double delta_t_reading = calculate_time();
     speed_reading = Get_Speed(delta_t_reading);
     Serial.print("Speed result: ");
-    Serial.println(actual_speed);
+    Serial.println(speed_reading);
 
     // Delay 1000s
-    delay(1000)
+    delay(1000);
 
 }
