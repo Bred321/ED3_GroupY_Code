@@ -12,6 +12,7 @@ int dir = 0, pwmPID = 0;
 
 
 
+
 double error = 0, error_prev = 0;
 double speed_input= 150;
 double integration = 0.0, derivative = 0;
@@ -22,16 +23,16 @@ double Kd = 0.0005; //0.01
 double Ki = 0.6; //0.5
 
 
-double calculate_time(){
+void calculate_time(){
     // Calculate the delta T
     t = micros();
     deltaT = ((double)(t - t_prev))/1.0e6;
     t_prev = t;
-    return t_prev;
 }
 
 void setup(){
-   Init_Motor();
+   pinMode(25, OUTPUT);
+   pinMode(26, OUTPUT);
    Init_Encoder();
    Serial.begin(115200);
 }
@@ -51,6 +52,7 @@ void PID(double deltaT)
     y = u/360*255;//Map the u value to 0-255
     error_prev = error;
 }
+
 
 void setMotor(int dir, int pwmVal){
   
@@ -98,20 +100,31 @@ void drive_motor()
 
 
 void loop(){
-    // Drive the motor at full speed
-    Run_Max_Speed();
-
+    calculate_time();
+    // digitalWrite(25, HIGH);
+    // digitalWrite(26, LOW);
+    Get_Speed(deltaT);
+    PID(deltaT);
+    drive_motor();
+    // Encoder reading
     angle_reading = Get_Angle();
     Serial.print("Angle result: ");
     Serial.println(angle_reading);
 
-    // Velocity reading
-    double delta_t_reading = calculate_time();
-    speed_reading = Get_Speed(delta_t_reading);
+    
+   
     Serial.print("Speed result: ");
-    Serial.println(speed_reading);
+    Serial.println(actual_speed);
 
-    // Delay 1000s
-    delay(1000);
+    Serial.print("error: ");
+    Serial.println(error);
+
+    Serial.print("i: ");
+    Serial.println(integration);
+
+    Serial.print("d: ");
+    Serial.println(derivative);
+
+    delay(300);
 
 }
