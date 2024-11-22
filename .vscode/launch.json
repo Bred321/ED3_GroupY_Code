@@ -12,9 +12,9 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "D:/EEET2610_ED3_GROUP_Y/ED3_GroupY_Code/.pio/build/nodemcu-32s/firmware.elf",
+            "executable": "D:/ED3_GroupY_Code/.pio/build/nodemcu-32s/firmware.elf",
             "projectEnvName": "nodemcu-32s",
-            "toolchainBinDir": "C:/Users/ADMIN/.platformio/packages/toolchain-xtensa-esp32/bin",
+            "toolchainBinDir": "C:/Users/User/.platformio/packages/toolchain-xtensa-esp32@8.4.0+2021r2-patch5/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
                 "type": "PlatformIO",
@@ -25,18 +25,18 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "D:/EEET2610_ED3_GROUP_Y/ED3_GroupY_Code/.pio/build/nodemcu-32s/firmware.elf",
+            "executable": "D:/ED3_GroupY_Code/.pio/build/nodemcu-32s/firmware.elf",
             "projectEnvName": "nodemcu-32s",
-            "toolchainBinDir": "C:/Users/ADMIN/.platformio/packages/toolchain-xtensa-esp32/bin",
+            "toolchainBinDir": "C:/Users/User/.platformio/packages/toolchain-xtensa-esp32@8.4.0+2021r2-patch5/bin",
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "D:/EEET2610_ED3_GROUP_Y/ED3_GroupY_Code/.pio/build/nodemcu-32s/firmware.elf",
+            "executable": "D:/ED3_GroupY_Code/.pio/build/nodemcu-32s/firmware.elf",
             "projectEnvName": "nodemcu-32s",
-            "toolchainBinDir": "C:/Users/ADMIN/.platformio/packages/toolchain-xtensa-esp32/bin",
+            "toolchainBinDir": "C:/Users/User/.platformio/packages/toolchain-xtensa-esp32@8.4.0+2021r2-patch5/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "loadMode": "manual"
         }
