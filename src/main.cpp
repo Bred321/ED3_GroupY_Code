@@ -14,12 +14,12 @@ int dir = 0, pwmPID = 0;
 
 
 double error = 0, error_prev = 0;
-double speed_input= 150;
+double speed_input= -150;
 double integration = 0.0, derivative = 0;
 
 //PID constants
 double Kp = 1.57;
-double Kd = 0.0005; //0.01
+double Kd = 0.005; //0.0005
 double Ki = 0.6; //0.5
 
 
@@ -116,8 +116,8 @@ void loop(){
     Serial.print("Speed result: ");
     Serial.println(actual_speed);
 
-    Serial.print("error: ");
-    Serial.println(error);
+    Serial.print("pwmpid: ");
+    Serial.println(pwmPID);
 
     Serial.print("i: ");
     Serial.println(integration);
