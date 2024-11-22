@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <Arduino.h>
 #include "motor_control.hpp"
 #include "encoder_reading.hpp"
 
@@ -10,18 +10,17 @@ long t = 0;
 long t_prev = 0;
 
 
-long calculate_time(){
+void calculate_time(){
     // Calculate the delta T
     t = micros();
-    deltaT = ((double)(t - t_prev)) / 1.0e6;
+    deltaT = ((double)(t - t_prev))/1.0e6;
     t_prev = t;
-    return deltaT;
 }
 
 void setup(){
    Init_Motor();
    Init_Encoder();
-   Serial.begin(9600);
+   Serial.begin(115200);
 }
 
 
@@ -29,7 +28,6 @@ void loop(){
     // Drive the motor at full speed
     Run_Max_Speed();
 
-    // Encoder angle reading
     angle_reading = Get_Angle();
     Serial.print("Angle result: ");
     Serial.println(angle_reading);
@@ -38,9 +36,9 @@ void loop(){
     double delta_t_reading = calculate_time();
     speed_reading = Get_Speed(delta_t_reading);
     Serial.print("Speed result: ");
-    Serial.println(speed_reading);
+    Serial.println(actual_speed);
 
     // Delay 1000s
-    delay(1000);
+    delay(1000)
 
 }
