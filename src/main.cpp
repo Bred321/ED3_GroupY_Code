@@ -19,27 +19,28 @@ long calculate_time(){
 }
 
 void setup(){
-   pinMode(25, OUTPUT);
-   pinMode(26, OUTPUT);
+   Init_Motor();
    Init_Encoder();
    Serial.begin(9600);
 }
 
 
 void loop(){
-    digitalWrite(25, HIGH);
-    digitalWrite(26, LOW);
+    // Drive the motor at full speed
+    Run_Max_Speed();
 
-    // Encoder reading
+    // Encoder angle reading
     angle_reading = Get_Angle();
     Serial.print("Angle result: ");
     Serial.println(angle_reading);
 
+    // Velocity reading
     double delta_t_reading = calculate_time();
     speed_reading = Get_Speed(delta_t_reading);
     Serial.print("Speed result: ");
     Serial.println(speed_reading);
 
+    // Delay 1000s
     delay(1000);
 
 }
