@@ -12,6 +12,7 @@ int dir = 0, pwmPID = 0;
 
 
 
+
 double error = 0, error_prev = 0;
 double speed_input= 150;
 double integration = 0.0, derivative = 0;
@@ -51,6 +52,7 @@ void PID(double deltaT)
     y = u/360*255;//Map the u value to 0-255
     error_prev = error;
 }
+
 
 void setMotor(int dir, int pwmVal){
   
