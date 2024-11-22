@@ -44,3 +44,8 @@ void Run_Motor()
 {
     Send_PWM(MOT1_A, MOT1_B, MOT1_cmd, MOT1_Channel);
 }
+
+void Run_Max_Speed(){
+    digitalWrite(MOT1_A, HIGH);
+    digitalWrite(MOT1_B, LOW);
+}

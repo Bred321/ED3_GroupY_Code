@@ -1,7 +1,8 @@
 #include <Arduino.h>
-#include <encoder_reading.hpp>
-#define ENC1_A 33    // MOT 1A
-#define ENC1_B 32   // MOT 1B
+#include "encoder_reading.hpp"
+
+#define ENC1_A 4    // MOT 1A
+#define ENC1_B 16   // MOT 1B
 #define ENC_RES 330 // Encoder resolution*Gearbox ratio: 11*30
 
 volatile long int cnt1 = 0; // Volatile as it changed during interrupt
@@ -19,14 +20,7 @@ void readEncoder1()
     
     
 }
-void Get_Speed(double deltaT){
-    raw_speed = (cnt1 - count_a_prev) / deltaT;
-    count_a_prev = cnt1;
 
-    // Convert raw to real speed
-    actual_speed = (raw_speed /330) * 60;
-    
-}
 void Init_Encoder()
 {
     pinMode(ENC1_A, INPUT);
@@ -38,4 +32,13 @@ double Get_Angle()
 {
     th1 = cnt1 * 360 / ENC_RES; // Conversion between encoder count and degree
     return th1;
+}
+
+double Get_Speed(double deltaT){
+    raw_speed = (cnt1 - count_a_prev) / deltaT;
+    count_a_prev = cnt1;
+
+    // Convert raw to real speed
+    actual_speed = raw_speed / (330 * 60);
+    return actual_speed;
 }
