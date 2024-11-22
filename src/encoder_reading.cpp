@@ -34,11 +34,10 @@ double Get_Angle()
     return th1;
 }
 
-double Get_Speed(double deltaT){
+void Get_Speed(double deltaT){
     raw_speed = (cnt1 - count_a_prev) / deltaT;
     count_a_prev = cnt1;
 
     // Convert raw to real speed
-    actual_speed = raw_speed / (330 * 60);
-    return actual_speed;
+    actual_speed = (raw_speed /330) * 60;
 }
