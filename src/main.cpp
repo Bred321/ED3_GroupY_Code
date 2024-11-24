@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include "motor_control.hpp"
 #include "encoder_reading.hpp"
+#include "agv_kinematics"
 
 
+// Variables for encoder value reading
 double angle_reading = 0;
 double deltaT = 0;
 long t = 0;
@@ -12,7 +14,7 @@ int dir = 0, pwmPID = 0;
 
 
 
-
+// Variables for PID controllers
 double error = 0, error_prev = 0;
 double speed_input= -150;
 double integration = 0.0, derivative = 0;
