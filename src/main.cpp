@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "motor_control.hpp"
 #include "encoder_reading.hpp"
-#include "agv_kinematics"
+#include "agv_kinematics.hpp"
 
 
 // Variables for encoder value reading
