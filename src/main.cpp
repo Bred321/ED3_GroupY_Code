@@ -1,7 +1,10 @@
 #include <Arduino.h>
+#include <esp_now.h>
+#include "WIFI.h"
 #include "motor_control.hpp"
 #include "encoder_reading.hpp"
 #include "agv_kinematics.hpp"
+#include "esp_now_sender.hpp"
 
 
 // Variables for encoder value reading
@@ -36,6 +39,7 @@ void setup(){
    pinMode(25, OUTPUT);
    pinMode(26, OUTPUT);
    Init_Encoder();
+   esp_now_setup();
    Serial.begin(115200);
 }
 
@@ -127,6 +131,7 @@ void loop(){
     Serial.print("d: ");
     Serial.println(derivative);
 
+    esp_now_send_message();
     delay(300);
 
 }
