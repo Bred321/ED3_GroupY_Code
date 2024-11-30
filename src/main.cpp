@@ -5,6 +5,7 @@
 #include "encoder_reading.hpp"
 #include "agv_kinematics.hpp"
 #include "esp_now_sender.hpp"
+#include "pid.hpp"
 
 
 // Variables for encoder value reading
@@ -12,6 +13,8 @@ double angle_reading = 0;
 double deltaT = 0;
 long t = 0;
 long t_prev = 0;
+
+// PID parameters
 double y = 0,u = 0;
 int dir = 0, pwmPID = 0;
 
