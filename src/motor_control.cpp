@@ -1,14 +1,14 @@
 #include <Arduino.h>
 #include "motor_control.hpp"
 
-#define MOT1_FW 25 
-#define MOT1_BW 26 
-#define MOT2_FW 25 
-#define MOT2_BW 26 
-#define MOT3_FW 25 
-#define MOT3_BW 26 
-#define MOT4_FW 25 
-#define MOT4_BW 26 
+#define MOT1_FW 26 
+#define MOT1_BW 25 
+#define MOT2_FW 22 
+#define MOT2_BW 23
+#define MOT3_FW 16
+#define MOT3_BW 18
+#define MOT4_FW 21
+#define MOT4_BW 19
 
 #define MOT1_Channel 0 // MOT 1 channel
 
@@ -49,8 +49,8 @@ void Send_PWM(int PINA, int PINB, double mot_cmd, int channel)
 
 
 void Run_Max_Speed(){
-    digitalWrite(MOT1_FW, HIGH);
-    digitalWrite(MOT1_BW, LOW);
+  analogWrite(MOT1_FW, 255);
+  analogWrite(MOT1_BW, 0);
 }
 
 void setMotorSpeed(int i, int spd) {
