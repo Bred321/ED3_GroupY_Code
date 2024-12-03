@@ -1,7 +1,6 @@
 #include "pid.hpp"
 #include <cmath>
-
-
+#include "encoder_reading.hpp"
 // PID parameters
 // double y = 0,u = 0;
 // int dir = 0, pwmPID = 0;
@@ -12,65 +11,41 @@
 // double speed_input= -150;
 // double integration = 0.0, derivative = 0;
 
-PID_CLASS::PID_CLASS(double kp, double ki, double kd) : Kp(kp), Ki(ki), Kd(kd) { }
+PID_CLASS::PID_CLASS(double kp, double ki, double kd, int motor) : Kp(kp), Ki(ki), Kd(kd),Motor(motor) { }
 
 
-void PID_CLASS::calculate(double deltaT, double actualSpeed)
+void PID_CLASS::calculate()
 {
-    
-    if(std::isnan(integration))
-    {
-      integration = 0;
-    }
-    error = speed_input - actualSpeed;
-    integration = integration + (error*deltaT);
-    derivative = (error-error_prev)/deltaT;
-    // PID calculation
-    u = (Kp*error) + (Kd*derivative) + (Ki*integration);
-    y = u/360*255;//Map the u value to 0-255
-    error_prev = error;
-}
-
-
-void PID_CLASS::setMotor(int dir, int pwmVal){
-  
-  if(dir == 1){
-    analogWrite(25,0);
-    analogWrite(26,pwmVal);
+  switch(Motor){
+    case 1:
+    actualSpeed = actual_speed1;
+    break;
+    case 2:
+    actualSpeed = actual_speed2;
+    break;
+    case 3:
+    actualSpeed = actual_speed3;
+    break;
+    default:
+    actualSpeed = actual_speed4;
+    break;
   }
-  else if(dir == -1)
+
+  if(std::isnan(integration))
   {
-    analogWrite(25,pwmVal);
-    analogWrite(26,0);
+    integration = 0;
   }
-//   else 
-//   {
-//     digitalWrite(in1,LOW);
-//     digitalWrite(in2,LOW);
-//     pwmVal = 0;
-//   }
- }
-
-
-void PID_CLASS::drive_motor()
-{
-    if(u>0)
-    {
-      dir = 1;
-    }
-    else if(u<0)
-    {
-      dir = -1;
-    }
-
-    pwmPID = (int) fabs(y);
-    if(pwmPID > 255)
-    {
-      pwmPID = 255;
-    }
-    if(pwmPID < 30 )
-    {
-      pwmPID = 30;
-    }
-  setMotor(dir, pwmPID);
+  error = inputSpeed - actualSpeed;
+  integration = integration + error;
+  derivative = error-error_prev;
+  // PID calculation
+  u = (Kp*error) + (Kd*derivative) + (Ki*integration);
+  y = u/360*255;//Map the u value to 0-255
+  error_prev = error;
 }
+
+void PID_CLASS::set_input(double input)
+{
+  this->inputSpeed = input;
+}
+
