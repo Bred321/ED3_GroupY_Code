@@ -5,6 +5,9 @@
 #include "encoder_reading.hpp"
 #include "agv_kinematics.hpp"
 #include "esp_now_sender.hpp"
+#include "pid.hpp"
+#define PID_rate 30
+#define PID_interval 1000/PID_rate
 
 
 // Variables for encoder value reading
@@ -12,126 +15,74 @@ double angle_reading = 0;
 double deltaT = 0;
 long t = 0;
 long t_prev = 0;
-double y = 0,u = 0;
-int dir = 0, pwmPID = 0;
 
-
-
-// Variables for PID controllers
-double error = 0, error_prev = 0;
-double speed_input= -150;
-double integration = 0.0, derivative = 0;
-
-//PID constants
-double Kp = 1.57;
-double Kd = 0.005; //0.0005
-double Ki = 0.6; //0.5
+long next_PID = 0;
 
 
 void calculate_time(){
     // Calculate the delta T
-    t = micros();
+    t = esp_timer_get_time();
     deltaT = ((double)(t - t_prev))/1.0e6;
     t_prev = t;
 }
 
+
+PID_CLASS motor3(2, 0.01, 1.1, MOTOR3);
+PID_CLASS motor4(2, 0.01, 1.1, MOTOR4);
+
+
 void setup(){
-   pinMode(25, OUTPUT);
-   pinMode(26, OUTPUT);
    Init_Encoder();
    esp_now_setup();
    Serial.begin(115200);
-}
-
-void PID(double deltaT)
-{
-    
-    if(isnan(integration))
-    {
-      integration = 0;
-    }
-    error = speed_input - actual_speed;
-    integration = integration + (error*deltaT);
-    derivative = (error-error_prev)/deltaT;
-    // PID calculation
-    u = (Kp*error) + (Kd*derivative) + (Ki*integration);
-    y = u/360*255;//Map the u value to 0-255
-    error_prev = error;
-}
-
-
-void setMotor(int dir, int pwmVal){
-  
-  if(dir == 1){
-    analogWrite(25,0);
-    analogWrite(26,pwmVal);
-  }
-  else if(dir == -1)
-  {
-    analogWrite(25,pwmVal);
-    analogWrite(26,0);
-  }
-//   else 
-//   {
-//     digitalWrite(in1,LOW);
-//     digitalWrite(in2,LOW);
-//     pwmVal = 0;
-//   }
  
-  
-}
-
-void drive_motor()
-{
-    if(u>0)
-    {
-      dir = 1;
-    }
-    else if(u<0)
-    {
-      dir = -1;
-    }
-
-    pwmPID = (int) fabs(y);
-    if(pwmPID > 255)
-    {
-      pwmPID = 255;
-    }
-    if(pwmPID < 30 )
-    {
-      pwmPID = 30;
-    }
-  setMotor(dir, pwmPID);
+   delay(1000);
 }
 
 
 void loop(){
-    calculate_time();
+    t = millis();
+   
+    
+    motor3.set_input(80);
+    motor4.set_input(-80);
+    
+
     // digitalWrite(25, HIGH);
     // digitalWrite(26, LOW);
+    
+    if (millis() > next_PID) {
+    deltaT = ((double)(t - t_prev))/1.0e3;
+    t_prev = t;
     Get_Speed(deltaT);
-    PID(deltaT);
-    drive_motor();
+    Serial.print(">Setpoint3: ");
+    Serial.println(motor3.inputSpeed);
+    Serial.print(">Speed result3: ");
+    Serial.println(actual_speed3);
+    Serial.print(">Setpoint4: ");
+    Serial.println(motor4.inputSpeed);
+    Serial.print(">Speed result4: ");
+    Serial.println(actual_speed4);
+    motor3.calculate();
+    motor4.calculate();
+    next_PID += PID_interval;
+    // Serial.print(">deltaT: ");
+    // Serial.println(deltaT);
+    drive_motor(0,0,motor3.get_output(),motor4.get_output());
+  }
+   
+    
     // Encoder reading
     angle_reading = Get_Angle();
-    Serial.print("Angle result: ");
-    Serial.println(angle_reading);
-
     
+    // Serial.print(">DeltaT: ");
+    // Serial.println(deltaT);
+    
+    
+    // delay(10);
    
-    Serial.print("Speed result: ");
-    Serial.println(actual_speed);
-
-    Serial.print("pwmpid: ");
-    Serial.println(pwmPID);
-
-    Serial.print("i: ");
-    Serial.println(integration);
-
-    Serial.print("d: ");
-    Serial.println(derivative);
-
-    esp_now_send_message();
-    delay(300);
+    
+    // Run_Max_Speed();
+    // esp_now_send_message();
 
 }
