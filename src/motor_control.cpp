@@ -1,14 +1,14 @@
 #include <Arduino.h>
 #include "motor_control.hpp"
 
-#define MOT1_FW 26 
-#define MOT1_BW 25 
-#define MOT2_FW 22 
-#define MOT2_BW 23
-#define MOT3_FW 16
-#define MOT3_BW 18
-#define MOT4_FW 21
-#define MOT4_BW 19
+#define MOT1_FW 23
+#define MOT1_BW 22
+#define MOT2_FW 4 
+#define MOT2_BW 14
+#define MOT3_FW 32
+#define MOT3_BW 33
+#define MOT4_FW 26
+#define MOT4_BW 25
 
 #define MOT1_Channel 0 // MOT 1 channel
 

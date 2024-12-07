@@ -29,14 +29,14 @@ void PID_CLASS::calculate()
   error = inputSpeed - actualSpeed;
   integration = integration + error;
   derivative = error-error_prev;
-  Serial.print("error: ");
-  Serial.println(error);
-  Serial.print("error_prev1: ");
-  Serial.println(error_prev);
-  Serial.print("d: ");
-  Serial.println(derivative);
-  Serial.print("i: ");
-  Serial.println(integration);
+  // Serial.print("error: ");
+  // Serial.println(error);
+  // Serial.print("error_prev1: ");
+  // Serial.println(error_prev);
+  // Serial.print("d: ");
+  // Serial.println(derivative);
+  // Serial.print("i: ");
+  // Serial.println(integration);
   // PID calculation
   u = (Kp*error) + (Kd*derivative) + (Ki*integration);
   // y = u/360*255;//Map the u value to 0-255

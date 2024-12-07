@@ -28,6 +28,7 @@ public:
     void calculate(); // Calculate PID output
     void set_input(double input);
     double get_output();
+    void print_output();
 };
 
 #endif // PID_HPP
