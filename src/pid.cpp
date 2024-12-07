@@ -1,8 +1,9 @@
 #include "pid.hpp"
 #include <cmath>
 #include "encoder_reading.hpp"
+#include "motor_control.hpp"
 
-PID_CLASS::PID_CLASS(double kp, double ki, double kd, int motor) : Kp(kp), Ki(ki), Kd(kd),Motor(motor) { }
+PID_CLASS::PID_CLASS(double kp, double kd, double ki, int motor) : Kp(kp), Ki(ki), Kd(kd),Motor(motor) { }
 
 
 void PID_CLASS::calculate()
@@ -22,29 +23,40 @@ void PID_CLASS::calculate()
     break;
   }
 
-  // if(std::isnan(integration))
-  // {
-  //   integration = 0;
-  // }
+  if(std::isnan(integration))
+  {
+    integration = 0;
+  }
   error = inputSpeed - actualSpeed;
   integration = integration + error;
   derivative = error-error_prev;
   // Serial.print("error: ");
   // Serial.println(error);
-  // Serial.print("error_prev1: ");
-  // Serial.println(error_prev);
-  // Serial.print("d: ");
-  // Serial.println(derivative);
-  // Serial.print("i: ");
-  // Serial.println(integration);
+  // Serial.print("error: ");
+  // Serial.println(error);
+ 
   // PID calculation
   u = (Kp*error) + (Kd*derivative) + (Ki*integration);
-  // y = u/360*255;//Map the u value to 0-255
-  y = u;
+  // Serial.print("u: ");
+  // Serial.println(u);
   error_prev = error;
-  Serial.print("error_prev2: ");
-  Serial.println(error_prev);
+  // Drive the motor
+  switch(Motor){
+    case 1:
+    setMotorSpeed(1, u);
+    break;
+    case 2:
+    setMotorSpeed(2, u);
+    break;
+    case 3:
+    setMotorSpeed(3, u);
+    break;
+    default:
+    setMotorSpeed(4, u);
+    break;
+  }
 }
+
 
 void PID_CLASS::set_input(double input)
 {
@@ -53,7 +65,19 @@ void PID_CLASS::set_input(double input)
 
 double PID_CLASS::get_output()
 {
-  return this->y;
+  return this->u;
+}
+void PID_CLASS::reset_PID()
+{
+  this->inputSpeed = 0;
+  this->u = 0;
+  this->integration = 0;
+}
+void PID_CLASS::set_PID(double kp, double kd, double ki)
+{
+  this->Kp = kp;
+  this->Kd = kd;
+  this->Ki = ki;
 }
 
 

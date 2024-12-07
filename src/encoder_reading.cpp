@@ -1,14 +1,14 @@
 #include <Arduino.h>
 #include "encoder_reading.hpp"
 
-#define ENC1_A 36    // MOT 1A
-#define ENC1_B 19  // MOT 1B
-#define ENC2_A 18    // MOT 1A
-#define ENC2_B 21  // MOT 1B
-#define ENC3_A 34    // MOT 1A
-#define ENC3_B 35  // MOT 1B
-#define ENC4_A 27    // MOT 1A
-#define ENC4_B 39  // MOT 1B
+#define ENC1_A 36    // VP
+#define ENC1_B 19 
+#define ENC2_A 18    
+#define ENC2_B 21  
+#define ENC3_A 34    
+#define ENC3_B 35 
+#define ENC4_A 27    
+#define ENC4_B 39  // VN
 #define ENC_RES 330 // Encoder resolution*Gearbox ratio: 11*30
 
 volatile long int cnt1 = 0, cnt2 = 0, cnt3 = 0, cnt4 = 0; // Volatile as it changed during interrupt

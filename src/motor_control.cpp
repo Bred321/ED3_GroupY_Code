@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "motor_control.hpp"
-
+// FW is LPWM and BW is RPWM
 #define MOT1_FW 23
 #define MOT1_BW 22
 #define MOT2_FW 4 
@@ -22,31 +22,13 @@ void Init_Motor()
 {
     pinMode(MOT1_FW, OUTPUT);
     pinMode(MOT1_BW, OUTPUT);
-    ledcSetup(MOT1_Channel, PWM_FREQ, PWM_RES);
+    pinMode(MOT2_FW, OUTPUT);
+    pinMode(MOT2_BW, OUTPUT);
+    pinMode(MOT3_FW, OUTPUT);
+    pinMode(MOT3_BW, OUTPUT);
+    pinMode(MOT4_FW, OUTPUT);
+    pinMode(MOT4_BW, OUTPUT);
 }
-//============================================================
-void Send_PWM(int PINA, int PINB, double mot_cmd, int channel)
-{
-    // Reverse direction, if the mot_cmd is from [-255; 0]
-    if (mot_cmd < 0)
-    {
-        ledcAttachPin(PINB, channel);
-        ledcDetachPin(PINA);
-        digitalWrite(PINA, LOW);
-        ledcWrite(channel, abs(mot_cmd));
-    }
-    // Forward direction, if the mot_cmd is from [0; 255]; 
-    else 
-    {
-        ledcAttachPin(PINA, channel);
-        ledcDetachPin(PINB);
-        digitalWrite(PINB, LOW);
-        ledcWrite(channel, abs(mot_cmd));
-    }
-}
-
-//============================================================
-
 
 void Run_Max_Speed(){
   analogWrite(MOT1_FW, 255);

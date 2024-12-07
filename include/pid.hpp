@@ -7,14 +7,12 @@
 #define MOTOR3 3
 #define MOTOR4 4
 class PID_CLASS {
-private:
+public:
     // PID gains
     double Kp;
     double Ki;
     double Kd;
     // Other PID parameters
-    
-    
     double actualSpeed {0.0};
     double integration {0.0};
     double derivative {0.0};
@@ -24,11 +22,12 @@ public:
     double error = 0, error_prev = 0;
     double y {0};
     double u {0};
-    PID_CLASS(double kp, double ki, double kd, int motor); // Constructor
+    PID_CLASS(double kp, double kd, double ki, int motor); // Constructor
     void calculate(); // Calculate PID output
     void set_input(double input);
     double get_output();
-    void print_output();
+    void reset_PID();
+    void set_PID(double kp, double kd, double ki);
 };
 
 #endif // PID_HPP
