@@ -9,13 +9,8 @@
 #define MOT3_BW 33
 #define MOT4_FW 26
 #define MOT4_BW 25
+int moving = 0;
 
-#define MOT1_Channel 0 // MOT 1 channel
-
-#define PWM_FREQ 10000 // PWM Frequency: 10kHz
-#define PWM_RES 8      // PWM resolution 255
-
-double MOT1_cmd = 0; // MOT1 command [-255; 255]
 
 //============================================================
 void Init_Motor()
@@ -37,7 +32,6 @@ void Run_Max_Speed(){
 
 void setMotorSpeed(int i, int spd) {
     unsigned char reverse = 0;
-  
     if (spd < 0)
     {
       spd = -spd;
@@ -66,6 +60,7 @@ void setMotorSpeed(int i, int spd) {
 
 void drive_motor(int spd1, int spd2, int spd3, int spd4)
 {
+
     setMotorSpeed(1, spd1);
     setMotorSpeed(2, spd2);
     setMotorSpeed(3, spd3);

@@ -13,6 +13,10 @@ PID_CLASS motor1(2, 0.01, 1.1, MOTOR1);
 PID_CLASS motor2(2, 0.01, 1.1, MOTOR2);
 PID_CLASS motor3(2, 0.01, 1.1, MOTOR3);
 PID_CLASS motor4(2, 0.01, 1.1, MOTOR4);
+/* Stop the robot if it hasn't received a movement command
+   in this number of milliseconds */
+#define AUTO_STOP_INTERVAL 5000 //2000
+long lastMotorCommand = AUTO_STOP_INTERVAL;
 // A pair of varibles to help parse serial commands 
 int arg = 0;
 int index2 = 0;
@@ -71,8 +75,6 @@ void runCommand() {
     Serial.println(motor3.integration);
     Serial.print("d: ");
     Serial.println(motor3.derivative);
-    Serial.print("ER: ");
-    Serial.println(motor3.error);
     Serial.print("Kp: ");
     Serial.println(motor3.Kp);
     Serial.print("Kd: ");
@@ -93,17 +95,22 @@ void runCommand() {
   // Set motor speeds terminal command
   case MOTOR_SPEEDS:
     /* Reset the auto stop timer */
-    
+    lastMotorCommand = millis();
     if (arg1 == 0 && arg2 == 0) {
-       motor3.set_input(0);
+       drive_motor(0, 0, 0, 0);
+       motor3.reset_PID();
+       moving = 0;
     }
-    else 
+    else moving = 1;
     motor3.set_input(arg1);
     motor4.set_input(arg2);
     Serial.println("OK"); 
     break;
 
   case MOTOR_RAW_PWM:
+    lastMotorCommand = millis();
+    motor3.reset_PID();
+    moving = 0;
     /* Reset the auto stop timer */
     drive_motor(0, 0, arg1, 0);
     Serial.println("OK"); 
@@ -128,7 +135,6 @@ void setup(){
    Init_Motor();
    esp_now_setup();
    Serial.begin(115200);
-   delay(1000);
 }
 
 
@@ -178,18 +184,15 @@ void loop(){
     deltaT = ((double)(t - t_prev))/1.0e3;
     t_prev = t;
     Get_Speed(deltaT);
-    // Serial.print(">Setpoint3: ");
-    // Serial.println(motor3.inputSpeed);
-    // Serial.print(">Speed result3: ");
-    // Serial.println(actual_speed3);
-    motor3.calculate();
-    // motor4.calculate();
-    // Serial.print(">deltaT: ");
-    // Serial.println(deltaT);
-    // drive_motor(0,0,motor3.get_output(),0);
+    motor3.do_PID();
     next_PID += PID_interval;
   }
-   
+  //Check to see if we have exceeded the auto-stop interval
+  if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
+    drive_motor(0, 0, 0, 0);
+    moving = 0;
+    delay(1);
+  }
     
     // Encoder reading
     // angle_reading = Get_Angle();

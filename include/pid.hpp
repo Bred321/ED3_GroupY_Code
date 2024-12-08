@@ -16,6 +16,7 @@ public:
     double actualSpeed {0.0};
     double integration {0.0};
     double derivative {0.0};
+    double last_actual_speed;
     int Motor=0;
 public:
     double inputSpeed {0.0};
@@ -27,6 +28,7 @@ public:
     void set_input(double input);
     double get_output();
     void reset_PID();
+    void do_PID();
     void set_PID(double kp, double kd, double ki);
 };
 

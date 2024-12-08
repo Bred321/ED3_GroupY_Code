@@ -28,18 +28,17 @@ void PID_CLASS::calculate()
     integration = 0;
   }
   error = inputSpeed - actualSpeed;
-  integration = integration + error;
-  derivative = error-error_prev;
-  // Serial.print("error: ");
-  // Serial.println(error);
-  // Serial.print("error: ");
-  // Serial.println(error);
+  integration = integration + Ki*error;
+  // derivative = error-error_prev;
+  double dInput = actualSpeed - last_actual_speed;
+  
  
   // PID calculation
-  u = (Kp*error) + (Kd*derivative) + (Ki*integration);
-  // Serial.print("u: ");
-  // Serial.println(u);
-  error_prev = error;
+  // u = (Kp*error) + (Kd*derivative) + integration;
+  u = (Kp*error) - Kd*dInput + integration;
+  // error_prev = error;
+  last_actual_speed = actualSpeed;
+
   // Drive the motor
   switch(Motor){
     case 1:
@@ -70,6 +69,8 @@ double PID_CLASS::get_output()
 void PID_CLASS::reset_PID()
 {
   this->inputSpeed = 0;
+  this->error_prev = 0;
+  this->last_actual_speed = 0;
   this->u = 0;
   this->integration = 0;
 }
@@ -78,6 +79,15 @@ void PID_CLASS::set_PID(double kp, double kd, double ki)
   this->Kp = kp;
   this->Kd = kd;
   this->Ki = ki;
+}
+void PID_CLASS::do_PID()
+{
+  if(!moving)
+  {
+    if(this->last_actual_speed != 0) this->reset_PID();
+    return;
+  }
+  this->calculate();
 }
 
 
