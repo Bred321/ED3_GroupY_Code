@@ -70,6 +70,7 @@ void PID_CLASS::reset_PID()
 {
   this->inputSpeed = 0;
   this->error_prev = 0;
+  this->actualSpeed = 0;
   this->last_actual_speed = 0;
   this->u = 0;
   this->integration = 0;

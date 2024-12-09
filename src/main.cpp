@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <esp_now.h>
+#include <iostream>
+#include <string>
 #include "WIFI.h"
 #include "motor_control.hpp"
 #include "encoder_reading.hpp"
@@ -9,13 +11,13 @@
 #include "commands.h"
 #define PID_rate 30
 #define PID_interval 1000/PID_rate
-PID_CLASS motor1(2, 0.01, 1.1, MOTOR1);
-PID_CLASS motor2(2, 0.01, 1.1, MOTOR2);
-PID_CLASS motor3(2, 0.01, 1.1, MOTOR3);
-PID_CLASS motor4(2, 0.01, 1.1, MOTOR4);
+PID_CLASS motor1(2, 3.95, 0.12, MOTOR1); // Kp:2/Kd: 3.95/Ki: 0.12
+PID_CLASS motor2(2, 3.95, 0.12, MOTOR2);
+PID_CLASS motor3(2, 3.95, 0.12, MOTOR3);
+PID_CLASS motor4(2, 3.95, 0.12, MOTOR4);
 /* Stop the robot if it hasn't received a movement command
    in this number of milliseconds */
-#define AUTO_STOP_INTERVAL 5000 //2000
+#define AUTO_STOP_INTERVAL 300000 //2000
 long lastMotorCommand = AUTO_STOP_INTERVAL;
 // A pair of varibles to help parse serial commands 
 int arg = 0;
@@ -58,7 +60,7 @@ void runCommand() {
   int i = 0;
   char *p = argv1;
   char *str;
-  int pid_args[4];
+  double pid_args[4];
   arg1 = atoi(argv1);
   arg2 = atoi(argv2);
   
@@ -76,11 +78,11 @@ void runCommand() {
     Serial.print("d: ");
     Serial.println(motor3.derivative);
     Serial.print("Kp: ");
-    Serial.println(motor3.Kp);
+    Serial.println(motor3.Kp,3);
     Serial.print("Kd: ");
-    Serial.println(motor3.Kd);
+    Serial.println(motor3.Kd,3);
     Serial.print("Ki: ");
-    Serial.println(motor3.Ki);
+    Serial.println(motor3.Ki,3);
     break;
   case READ_ENCODERS:
     Serial.print("Motor1: ");
@@ -117,9 +119,26 @@ void runCommand() {
     break;
 
   case UPDATE_PID:
-     while ((str = strtok_r(p, ":", &p)) != NULL) {
-       pid_args[i] = atoi(str);
-       i++;
+     while ((str = strtok_r(p, "/", &p)) != NULL) {
+       // Debug: Print each token
+      if(i<3){
+       pid_args[i] = std::atof(str);
+       switch(i)
+       {
+        case 0:
+        Serial.print("Kp: ");
+        Serial.println(pid_args[i]);
+        break;
+        case 1:
+        Serial.print("Kd: ");
+        Serial.println(pid_args[i]);
+        break;
+        case 2:
+        Serial.print("Ki: ");
+        Serial.println(pid_args[i]);
+       }
+       
+       i++;}
     }
     motor3.set_PID(pid_args[0], pid_args[1], pid_args[2]);
     Serial.println("OK");
@@ -135,6 +154,7 @@ void setup(){
    Init_Motor();
    esp_now_setup();
    Serial.begin(115200);
+   Serial2.begin(115200);
 }
 
 
@@ -146,7 +166,7 @@ void loop(){
     chr = Serial.read();
 
     // Terminate a command with a CR
-    if (chr == '/') {
+    if (chr == '\'') {
       if (arg == 1) argv1[index2] = '\0';
       else if (arg == 2) argv2[index2] = '\0';
       runCommand();
@@ -186,6 +206,10 @@ void loop(){
     Get_Speed(deltaT);
     motor3.do_PID();
     next_PID += PID_interval;
+    Serial2.print(">Setpoint: ");
+    Serial2.println(motor3.inputSpeed);
+    Serial2.print(">ActualSpeed: ");
+    Serial2.println(actual_speed3);
   }
   //Check to see if we have exceeded the auto-stop interval
   if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
