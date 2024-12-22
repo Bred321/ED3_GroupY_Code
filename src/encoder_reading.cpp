@@ -17,7 +17,7 @@ volatile long int cnt1_prev = 0, cnt2_prev = 0, cnt3_prev = 0, cnt4_prev = 0;
 double actual_speed1 = 0, actual_speed2 = 0, actual_speed3 = 0 ,actual_speed4 = 0;
 SimpleKalmanFilter motor1_filter(1, 1, 0.01);
 SimpleKalmanFilter motor2_filter(1, 1, 0.01);
-SimpleKalmanFilter motor3_filter(2, 2, 0.01);
+SimpleKalmanFilter motor3_filter(1, 1, 0.01);
 SimpleKalmanFilter motor4_filter(1, 1, 0.01);
 //================================================================================
 void readEncoder1()
@@ -73,12 +73,12 @@ double Get_Angle()
 
 void Get_Speed(double deltaT){
     // Convert raw to real speed
-    actual_speed1 = (((cnt1 - cnt1_prev) / deltaT)/360) * 60;
+    actual_speed1 = motor1_filter.updateEstimate((((cnt1 - cnt1_prev) / deltaT)/360) * 60);
     cnt1_prev = cnt1;
-    actual_speed2 = (((cnt2 - cnt2_prev) / deltaT)/360) * 60;
+    actual_speed2 = motor2_filter.updateEstimate((((cnt2 - cnt2_prev) / deltaT)/360) * 60);
     cnt2_prev = cnt2;
     actual_speed3 = motor3_filter.updateEstimate((((cnt3 - cnt3_prev) / deltaT)/360) * 60);
     cnt3_prev = cnt3;
-    actual_speed4 = (((cnt4 - cnt4_prev) / deltaT)/360) * 60;
+    actual_speed4 = motor4_filter.updateEstimate((((cnt4 - cnt4_prev) / deltaT)/360) * 60);
     cnt4_prev = cnt4;
 }

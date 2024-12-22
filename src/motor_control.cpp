@@ -28,6 +28,12 @@ void Init_Motor()
 void Run_Max_Speed(){
   analogWrite(MOT1_FW, 255);
   analogWrite(MOT1_BW, 0);
+  analogWrite(MOT2_FW, 255);
+  analogWrite(MOT2_BW, 0);
+  analogWrite(MOT3_FW, 255);
+  analogWrite(MOT3_BW, 0);
+  analogWrite(MOT4_FW, 255);
+  analogWrite(MOT4_BW, 0);
 }
 
 void setMotorSpeed(int i, int spd) {
