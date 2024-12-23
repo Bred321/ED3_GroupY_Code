@@ -11,13 +11,14 @@
 #include "commands.h"
 #define PID_rate 30
 #define PID_interval 1000/PID_rate
+Inverse_Output kinematic;
 PID_CLASS motor1(2, 3.95, 0.12, MOTOR1); // Kp:2/Kd: 3.95/Ki: 0.12
 PID_CLASS motor2(2, 3.95, 0.12, MOTOR2);
 PID_CLASS motor3(2, 3.95, 0.12, MOTOR3);
 PID_CLASS motor4(2, 3.95, 0.12, MOTOR4);
 /* Stop the robot if it hasn't received a movement command
    in this number of milliseconds */
-#define AUTO_STOP_INTERVAL 300000 //2000
+#define AUTO_STOP_INTERVAL 15000 //2000
 long lastMotorCommand = AUTO_STOP_INTERVAL;
 // A pair of varibles to help parse serial commands 
 int arg = 0;
@@ -80,6 +81,7 @@ void runCommand() {
   case READ_PID:
   if(arg1 == 1)
   {
+    Serial.println("--------MOTOR1 PID--------");
     Serial.print("SP: ");
     Serial.println(motor1.inputSpeed);
     Serial.print("ER: ");
@@ -97,8 +99,9 @@ void runCommand() {
     Serial.print("Ki: ");
     Serial.println(motor1.Ki,3);
   }
-  else if(arg2 == 1)
+  else if(arg1 == 2)
    {
+    Serial.println("--------MOTOR2 PID--------");
     Serial.print("SP: ");
     Serial.println(motor2.inputSpeed);
     Serial.print("ER: ");
@@ -116,8 +119,9 @@ void runCommand() {
     Serial.print("Ki: ");
     Serial.println(motor2.Ki,3);
   }
-  else if(arg3 == 1)
+  else if(arg1 == 3)
    {
+    Serial.println("--------MOTOR3 PID--------");
     Serial.print("SP: ");
     Serial.println(motor3.inputSpeed);
     Serial.print("ER: ");
@@ -135,8 +139,9 @@ void runCommand() {
     Serial.print("Ki: ");
     Serial.println(motor3.Ki,3);
   }
-  else if(arg4 == 1)
+  else if(arg1 == 4)
    {
+    Serial.println("--------MOTOR4 PID--------");
     Serial.print("SP: ");
     Serial.println(motor4.inputSpeed);
     Serial.print("ER: ");
@@ -155,7 +160,26 @@ void runCommand() {
     Serial.println(motor4.Ki,3);
   }
     break;
+  case KINEMATIC:
+  /* Reset the auto stop timer */
+    lastMotorCommand = millis();
+  if (arg1 == 0 && arg2 == 0 && arg3 == 0 && arg4 == 0) {
+      drive_motor(0, 0, 0, 0);
+      motor1.reset_PID();
+      motor2.reset_PID();
+      motor3.reset_PID();
+      motor4.reset_PID();
+      moving = 0;
+    }
+    else moving = 1;
+    calculate_inverse_kinematics(arg1, arg2, arg3);
+    motor1.set_input(kinematic.v1);
+    motor2.set_input(kinematic.v2);
+    motor3.set_input(kinematic.v3);
+    motor4.set_input(kinematic.v4);
+    Serial.println("OK");
 
+  break;
   case READ_ENCODERS:
     Serial.print("Motor1: ");
     Serial.println(actual_speed1);
@@ -219,7 +243,10 @@ void runCommand() {
         i++;
       }
     }
+    motor1.set_PID(pid_args[0], pid_args[1], pid_args[2]);
+    motor2.set_PID(pid_args[0], pid_args[1], pid_args[2]);
     motor3.set_PID(pid_args[0], pid_args[1], pid_args[2]);
+    motor4.set_PID(pid_args[0], pid_args[1], pid_args[2]);
     Serial.println("OK");
     break;
 

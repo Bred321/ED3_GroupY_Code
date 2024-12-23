@@ -7,6 +7,7 @@
 #define READ_PID       'g'
 #define RESET_ENCODERS 'r'
 #define UPDATE_PID     'p'
+#define KINEMATIC      'k'
 #define LEFT            0
 #define RIGHT           1
 
