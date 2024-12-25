@@ -3,6 +3,7 @@
 
 #define READ_ENCODERS  'e'
 #define MOTOR_SPEEDS   'm'
+#define MOTOR_SPEEDS_ALL 'l'
 #define MOTOR_RAW_PWM  'o'
 #define READ_PID       'g'
 #define RESET_ENCODERS 'r'

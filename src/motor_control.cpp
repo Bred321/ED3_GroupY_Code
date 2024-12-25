@@ -35,6 +35,13 @@ void Run_Max_Speed(){
   analogWrite(MOT4_FW, 255);
   analogWrite(MOT4_BW, 0);
 }
+void Send_PWM(int pin, int pwm)
+{
+  for(int i = 0; i <= pwm; i++)
+  {
+    analogWrite(pin,i);
+  }
+}
 
 void setMotorSpeed(int i, int spd) {
     unsigned char reverse = 0;
@@ -47,8 +54,8 @@ void setMotorSpeed(int i, int spd) {
       spd = 255;
     
     if (i == 1) { 
-      if      (reverse == 0) { analogWrite(MOT1_FW, spd); analogWrite(MOT1_BW, 0); }
-      else if (reverse == 1) { analogWrite(MOT1_FW, 0); analogWrite(MOT1_BW, spd); }
+      if      (reverse == 0) { Send_PWM(MOT1_FW, spd); Send_PWM(MOT1_BW, 0); }
+      else if (reverse == 1) { Send_PWM(MOT1_FW, 0); Send_PWM(MOT1_BW, spd); }
     }
     else if (i == 2) {
       if      (reverse == 0) { analogWrite(MOT2_FW, spd); analogWrite(MOT2_BW, 0); }

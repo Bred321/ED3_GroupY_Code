@@ -28,8 +28,10 @@ void PID_CLASS::calculate()
     integration = 0;
   }
   error = inputSpeed - actualSpeed;
+  //http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-tuning-changes/
   integration = integration + Ki*error;
   // derivative = error-error_prev;
+  //http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-derivative-kick/
   double dInput = actualSpeed - last_actual_speed;
   
  

@@ -12,13 +12,13 @@
 #define PID_rate 30
 #define PID_interval 1000/PID_rate
 Inverse_Output kinematic;
-PID_CLASS motor1(2, 3.95, 0.12, MOTOR1); // Kp:2/Kd: 3.95/Ki: 0.12
-PID_CLASS motor2(2, 3.95, 0.12, MOTOR2);
-PID_CLASS motor3(2, 3.95, 0.12, MOTOR3);
-PID_CLASS motor4(2, 3.95, 0.12, MOTOR4);
+PID_CLASS motor1(0.5, 1.5, 0.09, MOTOR1); // Kp:2/Kd: 3.95/Ki: 0.12
+PID_CLASS motor2(0.5, 1.5, 0.09, MOTOR2);
+PID_CLASS motor3(0.5, 1.5, 0.09, MOTOR3);
+PID_CLASS motor4(0.5, 1.5, 0.09, MOTOR4);
 /* Stop the robot if it hasn't received a movement command
    in this number of milliseconds */
-#define AUTO_STOP_INTERVAL 15000 //2000
+#define AUTO_STOP_INTERVAL 60000 //2000
 long lastMotorCommand = AUTO_STOP_INTERVAL;
 // A pair of varibles to help parse serial commands 
 int arg = 0;
@@ -77,7 +77,24 @@ void runCommand() {
   arg4 = atoi(argv4);
   
   switch(cmd) {
-  // Read encoder terminal command
+  case MOTOR_SPEEDS_ALL:
+    /* Reset the auto stop timer */
+    lastMotorCommand = millis();
+    if (arg1 == 0) {
+      drive_motor(0, 0, 0, 0);
+      motor1.reset_PID();
+      motor2.reset_PID();
+      motor3.reset_PID();
+      motor4.reset_PID();
+      moving = 0;
+    }
+    else moving = 1;
+    motor1.set_input(arg1);
+    motor2.set_input(arg1);
+    motor3.set_input(arg1);
+    motor4.set_input(arg1);
+    Serial.println("OK"); 
+  break;
   case READ_PID:
   if(arg1 == 1)
   {
@@ -333,10 +350,22 @@ void loop() {
     motor3.do_PID();
     motor4.do_PID();
     next_PID += PID_interval;
+    Serial2.print(">Setpoint Motor1: ");
+    Serial2.println(motor1.inputSpeed);
+    Serial2.print(">ActualSpeed Motor1: ");
+    Serial2.println(actual_speed1);
+    Serial2.print(">Setpoint Motor2: ");
+    Serial2.println(motor2.inputSpeed);
+    Serial2.print(">ActualSpeed Motor2: ");
+    Serial2.println(actual_speed2);
     Serial2.print(">Setpoint Motor3: ");
     Serial2.println(motor3.inputSpeed);
     Serial2.print(">ActualSpeed Motor3: ");
     Serial2.println(actual_speed3);
+    Serial2.print(">Setpoint Motor4: ");
+    Serial2.println(motor4.inputSpeed);
+    Serial2.print(">ActualSpeed Motor4: ");
+    Serial2.println(actual_speed4);
   }
 
   if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
