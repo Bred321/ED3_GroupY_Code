@@ -1,14 +1,14 @@
 #include <Arduino.h>
 #include "motor_control.hpp"
 // FW is LPWM and BW is RPWM
-#define MOT1_FW 23
-#define MOT1_BW 22
+#define MOT1_FW 22
+#define MOT1_BW 23
 #define MOT2_FW 4 
 #define MOT2_BW 14
-#define MOT3_FW 32
-#define MOT3_BW 33
-#define MOT4_FW 26
-#define MOT4_BW 25
+#define MOT3_FW 33
+#define MOT3_BW 32
+#define MOT4_FW 25
+#define MOT4_BW 26
 int moving = 0;
 
 
