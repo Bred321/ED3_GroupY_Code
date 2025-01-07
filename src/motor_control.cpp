@@ -11,8 +11,7 @@
 #define MOT4_BW 26
 int moving = 0;
 
-
-//============================================================
+// Initialize all the output pins for motors control
 void Init_Motor()
 {
     pinMode(MOT1_FW, OUTPUT);
@@ -24,7 +23,7 @@ void Init_Motor()
     pinMode(MOT4_FW, OUTPUT);
     pinMode(MOT4_BW, OUTPUT);
 }
-
+// Run all motors at maximum speed using PWM
 void Run_Max_Speed(){
   analogWrite(MOT1_FW, 255);
   analogWrite(MOT1_BW, 0);
@@ -42,7 +41,7 @@ void Send_PWM(int pin, int pwm)
     analogWrite(pin,i);
   }
 }
-
+// Set the motor speeds with according direction for a single motor
 void setMotorSpeed(int i, int spd) {
     unsigned char reverse = 0;
     if (spd < 0)
@@ -70,7 +69,7 @@ void setMotorSpeed(int i, int spd) {
       else if (reverse == 1) { analogWrite(MOT4_FW, 0); analogWrite(MOT4_BW, spd); }
     }
   }
-
+// Set the motor speeds with according direction for all motors
 void drive_motor(int spd1, int spd2, int spd3, int spd4)
 {
 

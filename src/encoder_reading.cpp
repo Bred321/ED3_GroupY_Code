@@ -20,6 +20,7 @@ SimpleKalmanFilter motor2_filter(1, 1, 0.01);
 SimpleKalmanFilter motor3_filter(1, 1, 0.01);
 SimpleKalmanFilter motor4_filter(1, 1, 0.01);
 //================================================================================
+// Read pulses directly from encoders
 void readEncoder1()
 {
     int b = digitalRead(ENC1_B);
@@ -41,6 +42,7 @@ void readEncoder3()
     
     
 }
+
 void readEncoder4()
 {
     int b = digitalRead(ENC4_B);
@@ -48,7 +50,7 @@ void readEncoder4()
     
     
 }
-
+// Initialize all the pins to read encoder values
 void Init_Encoder()
 {
     pinMode(ENC1_A, INPUT);
@@ -64,15 +66,9 @@ void Init_Encoder()
     attachInterrupt(digitalPinToInterrupt(ENC3_A), readEncoder3, RISING);
     attachInterrupt(digitalPinToInterrupt(ENC4_A), readEncoder4, RISING);
 }
-
-double Get_Angle()
-{
-    th1 = cnt1 * 360 / ENC_RES; // Conversion between encoder count and degree
-    return th1;
-}
-
+// Convert the read encoder values to RPM
 void Get_Speed(double deltaT){
-    // Convert raw to real speed
+    // Convert raw to real speed with Kalman filter
     actual_speed1 = motor1_filter.updateEstimate((((cnt1 - cnt1_prev) / deltaT)/360) * 60);
     cnt1_prev = cnt1;
     if(actual_speed1 < 1 && actual_speed1 > -1)

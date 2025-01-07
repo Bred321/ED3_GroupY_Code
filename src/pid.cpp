@@ -8,6 +8,7 @@ PID_CLASS::PID_CLASS(double kp, double kd, double ki, int motor) : Kp(kp), Ki(ki
 
 void PID_CLASS::calculate()
 {
+  // Read the feedback data of motor current speed (RPM)
   switch(Motor){
     case 1:
     this->actualSpeed = actual_speed1;
@@ -22,26 +23,23 @@ void PID_CLASS::calculate()
     this->actualSpeed = actual_speed4;
     break;
   }
-
+  // Sometimes integration is NAN
   if(std::isnan(integration))
   {
     integration = 0;
   }
+  // Calculate error
   error = inputSpeed - actualSpeed;
   //http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-tuning-changes/
   integration = integration + Ki*error;
-  // derivative = error-error_prev;
   //http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-derivative-kick/
   double dInput = actualSpeed - last_actual_speed;
   
- 
   // PID calculation
-  // u = (Kp*error) + (Kd*derivative) + integration;
   u = (Kp*error) - Kd*dInput + integration;
-  // error_prev = error;
   last_actual_speed = actualSpeed;
 
-  // Drive the motor
+  // Drive the motor using PID outputs
   switch(Motor){
     case 1:
     setMotorSpeed(1, u);
@@ -58,7 +56,7 @@ void PID_CLASS::calculate()
   }
 }
 
-
+// Set the target speed to do PID
 void PID_CLASS::set_input(double input)
 {
   this->inputSpeed = input;
@@ -68,6 +66,7 @@ double PID_CLASS::get_output()
 {
   return this->u;
 }
+// Reset all PID related variables
 void PID_CLASS::reset_PID()
 {
   this->inputSpeed = 0;
@@ -77,12 +76,14 @@ void PID_CLASS::reset_PID()
   this->u = 0;
   this->integration = 0;
 }
+// Set new PID parameters - Kp Kd Ki
 void PID_CLASS::set_PID(double kp, double kd, double ki)
 {
   this->Kp = kp;
   this->Kd = kd;
   this->Ki = ki;
 }
+// Conduct PID calculation process
 void PID_CLASS::do_PID()
 {
   if(!moving)

@@ -1,24 +1,24 @@
 #include <Arduino.h>
-#include <esp_now.h>
 #include <iostream>
 #include <string>
 #include "WIFI.h"
 #include "motor_control.hpp"
 #include "encoder_reading.hpp"
 #include "agv_kinematics.hpp"
-#include "esp_now_sender.hpp"
 #include "pid.hpp"
 #include "commands.h"
+// Set PID rate as 30 times per loop
 #define PID_rate 30
 #define PID_interval 1000/PID_rate
 Inverse_Output kinematic;
+// Declare 4 motors using PID
 PID_CLASS motor1(0.5, 1.5, 0.09, MOTOR1); // Kp:2/Kd: 3.95/Ki: 0.12
 PID_CLASS motor2(0.5, 1.5, 0.09, MOTOR2);
 PID_CLASS motor3(0.5, 1.5, 0.09, MOTOR3);
 PID_CLASS motor4(0.5, 1.5, 0.09, MOTOR4);
 /* Stop the robot if it hasn't received a movement command
    in this number of milliseconds */
-#define AUTO_STOP_INTERVAL 60000 //2000
+#define AUTO_STOP_INTERVAL 160000 //2000
 long lastMotorCommand = AUTO_STOP_INTERVAL;
 // A pair of varibles to help parse serial commands 
 int arg = 0;
@@ -30,28 +30,25 @@ char chr;
 // Variable to hold the current single-character command
 char cmd;
 
-// Character arrays to hold the first and second arguments
+// Character arrays to hold the arguments
 char argv1[16];
 char argv2[16];
+char argv3[16];
+char argv4[16];
 
 // The arguments converted to integers
 long arg1;
 long arg2;
+long arg3;
+long arg4;
 
 // Variables for encoder value reading
 double angle_reading = 0;
 double deltaT = 0;
 long t = 0;
 long t_prev = 0;
-
 long next_PID = 0;
-
-// Add new arguments
-char argv3[16];
-char argv4[16];
-long arg3;
-long arg4;
-
+// Reset all command and ready to store new arguments
 void resetCommand() {
   cmd = '\0';
   memset(argv1, 0, sizeof(argv1));
@@ -65,7 +62,7 @@ void resetCommand() {
   arg = 0;
   index2 = 0;
 }
-
+// Execute the command from Serial
 void runCommand() {
   int i = 0;
   char *p = argv1;
@@ -77,6 +74,7 @@ void runCommand() {
   arg4 = atoi(argv4);
   
   switch(cmd) {
+  // Set speeds in RPM to all motors
   case MOTOR_SPEEDS_ALL:
     /* Reset the auto stop timer */
     lastMotorCommand = millis();
@@ -95,7 +93,9 @@ void runCommand() {
     motor4.set_input(arg1);
     Serial.println("OK"); 
   break;
+  // Print out all the PID parameters
   case READ_PID:
+  // Value of motor 1
   if(arg1 == 1)
   {
     Serial.println("--------MOTOR1 PID--------");
@@ -116,6 +116,7 @@ void runCommand() {
     Serial.print("Ki: ");
     Serial.println(motor1.Ki,3);
   }
+   // Value of motor 2
   else if(arg1 == 2)
    {
     Serial.println("--------MOTOR2 PID--------");
@@ -136,6 +137,7 @@ void runCommand() {
     Serial.print("Ki: ");
     Serial.println(motor2.Ki,3);
   }
+   // Value of motor 3
   else if(arg1 == 3)
    {
     Serial.println("--------MOTOR3 PID--------");
@@ -156,6 +158,7 @@ void runCommand() {
     Serial.print("Ki: ");
     Serial.println(motor3.Ki,3);
   }
+   // Value of motor 4
   else if(arg1 == 4)
    {
     Serial.println("--------MOTOR4 PID--------");
@@ -197,6 +200,7 @@ void runCommand() {
     Serial.println("OK");
 
   break;
+  // Read speeds in RPM of each motor
   case READ_ENCODERS:
     Serial.print("Motor1: ");
     Serial.println(actual_speed1);
@@ -227,7 +231,7 @@ void runCommand() {
     motor4.set_input(arg4);
     Serial.println("OK"); 
     break;
-
+  // Drive all motors using PWM signal from 0 - 255
   case MOTOR_RAW_PWM:
     lastMotorCommand = millis();
     motor1.reset_PID();
@@ -239,7 +243,7 @@ void runCommand() {
     drive_motor(arg1, arg2, arg3, arg4);
     Serial.println("OK"); 
     break;
-
+  // Change the PID parameters of each motor - Kd Ki Kp
   case UPDATE_PID:
     while ((str = strtok_r(p, "/", &p)) != NULL) {
       if(i < 3) {
@@ -273,11 +277,13 @@ void runCommand() {
   }
 }
 void setup(){
+  //Set up drivers and motors
    Init_Encoder();
    Init_Motor();
-   //esp_now_setup();
+   //Set up Serial communication
    Serial.begin(115200);
    Serial2.begin(115200);
+   // Delay for Serial initialization
    delay(2000);
 }
 
@@ -340,7 +346,7 @@ void loop() {
       }
     }
   }
-
+  // Do PID for all motors with fixed interval
   if (millis() > next_PID) {
     deltaT = ((double)(t - t_prev)) / 1.0e3;
     t_prev = t;
@@ -350,24 +356,16 @@ void loop() {
     motor3.do_PID();
     motor4.do_PID();
     next_PID += PID_interval;
-    Serial2.print(">Setpoint Motor1: ");
-    Serial2.println(motor1.inputSpeed);
-    Serial2.print(">ActualSpeed Motor1: ");
-    Serial2.println(actual_speed1);
-    Serial2.print(">Setpoint Motor2: ");
-    Serial2.println(motor2.inputSpeed);
-    Serial2.print(">ActualSpeed Motor2: ");
-    Serial2.println(actual_speed2);
-    Serial2.print(">Setpoint Motor3: ");
-    Serial2.println(motor3.inputSpeed);
-    Serial2.print(">ActualSpeed Motor3: ");
-    Serial2.println(actual_speed3);
-    Serial2.print(">Setpoint Motor4: ");
-    Serial2.println(motor4.inputSpeed);
-    Serial2.print(">ActualSpeed Motor4: ");
+  // Send the speed values of motors to web
+    Serial2.print(actual_speed1);
+    Serial2.print(" ");
+    Serial2.print(actual_speed2);
+    Serial2.print(" ");
+    Serial2.print(actual_speed3);
+    Serial2.print(" ");
     Serial2.println(actual_speed4);
   }
-
+  // Auto stop the robot after certain interval
   if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
     drive_motor(0, 0, 0, 0);
     moving = 0;
